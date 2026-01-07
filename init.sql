@@ -10,9 +10,9 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `user` (username, password, role) VALUES ('user_1', '{noop}user_1', 'USER');
-INSERT INTO `user` (username, password, role) VALUES ('editor_1', '{noop}editor_1', 'EDITOR');
-INSERT INTO `user` (username, password, role) VALUES ('adm_1', '{noop}adm_1', 'PRODUCT_ADMIN');
+INSERT INTO `user` (username, password, role) VALUES ('user_1', 'user_1', 'USER');
+INSERT INTO `user` (username, password, role) VALUES ('editor_1', 'editor_1', 'EDITOR');
+INSERT INTO `user` (username, password, role) VALUES ('adm_1', 'adm_1', 'PRODUCT_ADMIN');
 
 CREATE DATABASE IF NOT EXISTS product_service;
 USE product_service;
