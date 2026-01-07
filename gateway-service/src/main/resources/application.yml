@@ -1,0 +1,40 @@
+server:
+  port: 7573
+
+spring:
+  application:
+    name: gateway-service
+  mvc:
+    path-match:
+      matching-strategy: ant-path-matcher
+  reactor:
+    context-propagation: AUTO
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_HOST:localhost}:8848
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/product/**
+          filters:
+            - StripPrefix=1
+
+knife4j:
+  gateway:
+    # 是否开启
+    enabled: true
+    # 指定服务发现的模式聚合微服务文档，并且是默认`default`分组
+    strategy: discover

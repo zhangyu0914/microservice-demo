@@ -1,0 +1,46 @@
+# 定义用户组织单元
+dn: ou=users,dc=example,dc=com
+objectClass: organizationalUnit
+ou: users
+
+# 用户 1
+dn: uid=ldap_user_1,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: ldap_user_1
+sn: User1
+cn: LDAP User 1
+displayName: LDAP User 1
+uidNumber: 10001
+gidNumber: 10001
+homeDirectory: /home/ldap_user_1
+userPassword: ldap_user_1
+
+# 用户 2
+dn: uid=ldap_editor_1,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: ldap_editor_1
+sn: Editor1
+cn: LDAP Editor 1
+displayName: LDAP Editor 1
+uidNumber: 10002
+gidNumber: 10002
+homeDirectory: /home/ldap_editor_1
+userPassword: ldap_editor_1
+
+# 用户 3
+dn: uid=ldap_adm_1,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: ldap_adm_1
+sn: ldap_adm_1
+cn: LDAP Admin 1
+displayName: LDAP Admin 1
+uidNumber: 10003
+gidNumber: 10003
+homeDirectory: /home/ldap_adm_1
+userPassword: ldap_adm_1

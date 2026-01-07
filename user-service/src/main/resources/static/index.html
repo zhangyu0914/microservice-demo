@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微服务演示 - 首页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+<div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl text-center">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">欢迎进入系统</h1>
+
+    <div class="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+        <p class="text-blue-800 font-medium mb-2">当前登录状态：<span class="text-green-600">已认证</span></p>
+        <div id="token-info" class="text-left bg-white p-4 rounded border text-xs break-all font-mono text-gray-600 overflow-auto max-h-40">
+            正在加载 Token 信息...
+        </div>
+    </div>
+
+    <div class="flex space-x-4 justify-center">
+        <button onclick="logout()" class="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 transition duration-200">
+            退出登录
+        </button>
+        <button onclick="switchLogin()" class="bg-gray-800 text-white px-6 py-2 rounded-md hover:bg-gray-900 transition duration-200">
+            切换登录方式
+        </button>
+    </div>
+</div>
+
+<script>
+    window.onload = () => {
+        // 1. 优先从 URL 参数获取 token (用于 OAuth 回调)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlToken = urlParams.get('token');
+        if (urlToken) {
+            // 2. 如果 URL 中有 token，将其存入本地存储
+            localStorage.setItem('auth_token', urlToken);
+            // 3. 清理 URL 中的 token 参数，使用户看到的地址栏保持干净
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            alert('未检测到登录信息，请先登录');
+            window.location.href = 'login.html';
+            return;
+        }
+        document.getElementById('token-info').innerText = 'Token: ' + token;
+    };
+
+    function logout() {
+        localStorage.removeItem('auth_token');
+        window.location.href = 'login.html';
+    }
+
+    function switchLogin() {
+        // 切换登录方式实际上就是返回登录页并清除当前状态
+        localStorage.removeItem('auth_token');
+        window.location.href = 'login.html';
+    }
+</script>
+</body>
+</html>

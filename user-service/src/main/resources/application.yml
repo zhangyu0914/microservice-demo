@@ -1,0 +1,32 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+  ldap:
+    urls: ldap://${LDAP_HOST:localhost}:389
+    base: dc=example,dc=com
+    username: cn=admin,dc=example,dc=com
+    password: admin
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/user_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_HOST:localhost}:8848
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+github:
+  client-id: ${GITHUB_CLIENT_ID:Ov23liSoVOpv5b1ECqRB}
+  client-secret: ${GITHUB_CLIENT_SECRET:9a41620bd6cee534d940a63d4084c91705f23a24}
+
+gateway:
+  url: ${GATEWAY_URL:http://localhost:7573}

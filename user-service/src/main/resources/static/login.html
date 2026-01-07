@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微服务演示 - 统一登录</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+<div class="bg-white p-8 rounded-lg shadow-md w-96">
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">系统登录</h1>
+
+    <div class="flex mb-6 border-b text-sm">
+        <button id="tab-regular" class="flex-1 py-2 text-center font-medium tab-active" onclick="switchTab('regular')">普通登录</button>
+        <button id="tab-ldap" class="flex-1 py-2 text-center font-medium text-gray-500" onclick="switchTab('ldap')">LDAP 登录</button>
+        <button id="tab-github" class="flex-1 py-2 text-center font-medium text-gray-500" onclick="switchTab('github')">GitHub</button>
+    </div>
+
+    <!-- 登录表单 (普通 & LDAP 共用结构) -->
+    <div id="form-credentials">
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="username">用户名</label>
+            <input id="username" type="text" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户名">
+        </div>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="password">密码</label>
+            <input id="password" type="password" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入密码">
+        </div>
+        <button id="login-btn" onclick="handleLogin()" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200">登录</button>
+    </div>
+
+    <!-- GitHub 登录 -->
+    <div id="form-github" class="hidden text-center">
+        <p class="text-gray-600 mb-6">点击下方按钮通过 GitHub 账号安全登录</p>
+        <button onclick="handleGithubLogin()" class="w-full bg-gray-800 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-900 transition duration-200 flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub 登录
+        </button>
+    </div>
+</div>
+
+<script>
+    // const GATEWAY_URL = 'http://localhost:7573'; // 网关地址
+    const GATEWAY_URL = ''; // 网关地址
+    let currentLoginType = 'regular';
+
+    function switchTab(type) {
+        currentLoginType = type;
+        const tabs = ['regular', 'ldap', 'github'];
+        tabs.forEach(t => {
+            const tabEl = document.getElementById(`tab-${t}`);
+            if (t === type) {
+                tabEl.classList.add('tab-active');
+                tabEl.classList.remove('text-gray-500');
+            } else {
+                tabEl.classList.remove('tab-active');
+                tabEl.classList.add('text-gray-500');
+            }
+        });
+
+        const credForm = document.getElementById('form-credentials');
+        const gitForm = document.getElementById('form-github');
+
+        if (type === 'github') {
+            credForm.classList.add('hidden');
+            gitForm.classList.remove('hidden');
+        } else {
+            credForm.classList.remove('hidden');
+            gitForm.classList.add('hidden');
+            document.getElementById('login-btn').innerText = type === 'ldap' ? 'LDAP 登录' : '登录';
+        }
+    }
+
+    async function handleLogin() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if (!username || !password) {
+            alert('请输入用户名和密码');
+            return;
+        }
+
+        const endpoint = currentLoginType === 'ldap' ? '/user/auth/ldap-login' : '/user/auth/login';
+
+        try {
+            const response = await fetch(`${GATEWAY_URL}${endpoint}?username=${username}&password=${password}`, {
+                method: 'POST'
+            });
+            const result = await response.json();
+            if (result.code === 200) {
+                localStorage.setItem('auth_token', result.data.token);
+                window.location.href = 'index.html';
+            } else {
+                alert('登录失败: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('请求失败，请检查网关是否启动');
+        }
+    }
+
+    function handleGithubLogin() {
+        window.location.href = `${GATEWAY_URL}/user/auth/github`;
+    }
+
+    window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        if (token) {
+            localStorage.setItem('auth_token', token);
+            window.location.href = 'index.html';
+        }
+    };
+</script>
+</body>
+</html>
+
+
+实时
+
+跳到实时
